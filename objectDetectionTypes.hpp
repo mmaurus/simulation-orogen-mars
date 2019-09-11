@@ -7,6 +7,7 @@
 #include <base/Time.hpp>
 // TODO 1 #include <mars/interfaces/snmesh.h>
 
+
 namespace mars
 {
 
@@ -68,4 +69,30 @@ namespace mars
   };
 
 }
+
+// need to tell the stream_aligner/transformer that the timestamp of these types
+// is hidden in "header.stamp", instead of the default "time" member variable
+namespace aggregator {
+    inline base::Time determineTimestamp(const mars::Detection3DArray& sample)
+    {
+        return sample.header.stamp;
+    }
+
+    inline base::Time determineTimestamp(const mars::Detection3D& sample)
+    {
+        return sample.header.stamp;
+    }
+
+    inline base::Time determineTimestamp(const mars::PointCloud& sample)
+    {
+        return sample.header.stamp;
+    }
+
+    inline base::Time determineTimestamp(const mars::Header& sample)
+    {
+        return sample.stamp;
+    }
+}
+
+
 #endif
