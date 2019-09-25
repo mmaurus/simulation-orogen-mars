@@ -40,7 +40,9 @@ void AstronautLocalizerTask::updateHook()
 {
     AstronautLocalizerTaskBase::updateHook();
 
-    sim::SimEntity* ent = control->entities->getEntity(_entity_name.get());
+    sim::SimEntity* ent = control->entities->getEntity(_entity_name.get(), false);
+    if (ent == nullptr)
+        ent = control->entities->getRootOfAssembly(_entity_name.get());
     if (ent != nullptr) {
         configmaps::ConfigMap cfg = ent->getConfig();
         base::samples::RigidBodyState p;
@@ -54,6 +56,8 @@ void AstronautLocalizerTask::updateHook()
         p.targetFrame = "world";
 
         _astronaut_pose.write(p);
+    } else {
+        LOG_ERROR("Neither entity nor assembly with name '%s' found!", _entity_name.get().c_str());
     }
 }
 void AstronautLocalizerTask::errorHook()
