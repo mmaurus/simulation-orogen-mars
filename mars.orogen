@@ -12,6 +12,7 @@ import_types_from "jointTypes.hpp"
 import_types_from "poseType.hpp"
 import_types_from "objectDetectionTypes.hpp"
 import_types_from "wrenchTypes.hpp"
+import_types_from "poseUpdateType.hpp"
 import_types_from "base"
 
 
@@ -350,7 +351,7 @@ task_context "EntityFakeDetection" do
     property("minVisibleVertices", "/uint16_t", 5).
         doc("Number of vertices that have to be in the viewing frustum to be counted as seen. Center is counted as vertex.")
     property("use_camera", "/bool", false).
-		   doc("Whether the camera should be used.")
+        doc("Whether the camera should be used.")
 
     output_port('detectionArray', '/mars/Detection3DArray').
         doc 'Puts out the entities in a ROS similar detection format.'
@@ -387,6 +388,16 @@ task_context "RobotTeleportation" do
 
 end
 
+task_context "AstronautLocalizerTask" do
+    subclasses "Plugin"
+
+    property("entity_name", "/std/string", "astronaut").
+        doc("Name of mars entity which represents astronaut")
+
+    output_port("astronaut_pose", "/base/samples/RigidBodyState")
+end
+    
+
 task_context "RepositionTask" do
   # Repositions the named entities of the given scene in the current mars scene
     subclasses "Plugin"
@@ -406,6 +417,20 @@ task_context "RepositionTask" do
 
 end
 
+task_context "PoseUpdateTask" do
+    # Repositions the named entities of the given scene in the current mars scene
+      subclasses "Plugin"
+  
+      input_port('single_pose_update', '/mars/PoseUpdate')
+      input_port('multi_pose_updates', '/mars/PoseUpdates')
+
+      #input_port('single_relative_pose_update', '/mars/PoseUpdate')
+      #input_port('multi_relative_pose_updates', '/mars/PoseUpdates')
+      port_driven
+  
+      needs_configuration
+  
+  end
 
 task_context "ObjectHighlighter" do
     subclasses "Plugin"
