@@ -94,7 +94,9 @@ namespace mars {
       if (it.hasKey("file") || it.hasKey("path")) reloadScene = true;
     }
     // initialize with target 0
-    robot_entity = control->entities->getEntity(robot_name);
+    robot_entity = control->entities->getEntity(robot_name, false);
+    if (!robot_entity) robot_entity = control->entities->getRootOfAssembly(robot_name);
+    if (!robot_entity) { LOG_ERROR_S << "RobotTeleportation: "<< robot_name << " not found!"; }
     LOG_DEBUG_S << "RobotTeleportation: " << "got robot: "<< robot_name;
     reset_node_name = _reset_node_name.get();
     LOG_DEBUG_S << "RobotTeleportation: " << "got robot: "<< reset_node_name;
@@ -225,4 +227,3 @@ namespace mars {
   //     RobotTeleportationBase::cleanupHook();
   // }
 }
-

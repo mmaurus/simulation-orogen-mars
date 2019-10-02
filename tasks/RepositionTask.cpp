@@ -50,7 +50,10 @@ namespace mars {
     cfg["rotation"][2] = pose.orientation.y();
     cfg["rotation"][3] = pose.orientation.z();
 
-    sim::SimEntity* ent = control->entities->getEntity(entityname);
+    sim::SimEntity* ent = control->entities->getEntity(entityname, /*verbose*/false);
+    if (!ent) ent = control->entities->getRootOfAssembly(entityname);
+    if (!ent)
+      LOG_ERROR("Neither entity nor assembly with name '%s' found!", entityname.c_str());
     control->sim->physicsThreadLock();
     ent->setInitialPose(true, &cfg);
     control->sim->physicsThreadUnlock();
