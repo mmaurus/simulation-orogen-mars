@@ -321,10 +321,6 @@ task_context "IMU", subclasses: "Plugin" do
         argument('duration', '/uint16_t').
         returns('/bool').
         doc("Normally triggers bias estimation on the xsens imu, in simulation thios does nothing")
-
-    operation('resetIMU').
-        doc("Sets origin to current pose and outputs orientation_samples relative to newly set origin")
-
 end
 
 
