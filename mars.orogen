@@ -33,64 +33,64 @@ import_types_from "base"
 task_context "Task" do
 	needs_configuration
 
-        operation("loadScene").
-            argument("path","/std/string")
+    operation("loadScene").
+        argument("path","/std/string")
 
-        operation("setPosition").
-            argument("positions", "mars/Positions")
+    operation("setPosition").
+        argument("positions", "mars/Positions")
 
-        property('add_floor',"/bool",false)
+    property('add_floor',"/bool",false)
 
-        property('gravity',"/base/Vector3d").dynamic
+    property('gravity',"/base/Vector3d").dynamic
 
-        property("show_coordinate_system","bool",false).
-            dynamic
+    property("show_coordinate_system","bool",false).
+        dynamic
 
-        property("use_now_instead_of_sim_time","/bool",false)
+    property("use_now_instead_of_sim_time","/bool",false)
 
-        property("reaction_to_physics_error","/std/string","shutdown").
-            doc("Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this task to the error state)").
-            dynamic
+    property("reaction_to_physics_error","/std/string","shutdown").
+        doc("Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this task to the error state)").
+        dynamic
 
-        property('initial_scene', '/std/string').
-	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
+    property('initial_scene', '/std/string').
+        doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
 
 	property('initial_scenes', '/std/vector</std/string>').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
 
-        property('positions', 'std/vector<mars/Positions>' ).
+    property('positions', 'std/vector<mars/Positions>' ).
 	    doc('override positions in the scene (scn) file, e.g. move the terrain to create different experiment setups without changing the scene file itself')
 
 	property('initial_pose', 'mars/Pose' ).
 	    doc('override initial joint positions in the scene (scn) file, i.e. set an initial pose')
 
-        property('config_dir', '/std/string', "#{ENV['AUTOPROJ_CURRENT_ROOT']}/install/configuration/mars_default").
+    property('config_dir', '/std/string', "#{ENV['AUTOPROJ_CURRENT_ROOT']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
-        property('plugin_dir', '/std/string', "#{ENV['AUTOPROJ_CURRENT_ROOT']}/install/lib").
+    property('plugin_dir', '/std/string', "#{ENV['AUTOPROJ_CURRENT_ROOT']}/install/lib").
 	    doc('the full path where the plugins can be found')
 
 	property('plugins', '/std/vector</std/string>').
 	    doc('additional mars plugins to load. This can be a relative path to the plugin_dir, or absolute.')
 
-        property('simulation_property_list', '/std/vector</mars/SimulationProperty>').
+    property('simulation_property_list', '/std/vector</mars/SimulationProperty>').
 	    doc('list of attributes containing plugin and property name as well as the desired value')
 
-        property('distributed_simulation', 'bool').
+    property('distributed_simulation', 'bool').
 	    doc('switch to active the distributed simulation if needed')
 
-        property('enable_gui', 'bool').
+    property('enable_gui', 'bool').
 	    doc('start the simulation graphical interface with this module')
 
-        property('controller_port', 'int').
+    property('controller_port', 'int').
             doc('set the controller port, e.g. 1600 for communication with monster')
 
-        property('sim_step_size', 'double',0.01).
-            dynamic.
-            doc('The Step-size that each mars-step calculates')
+    property('sim_step_size', 'double',0.01).
+        dynamic.
+        doc('The Step-size that each mars-step calculates')
 
-        property('raw_options', '/std/vector<mars::Option>').
-            doc('forward the original mars arguments, such as -c 1600 for setting the ode port - option consists of name, here: -c and parameter: here 1600')
+    property('raw_options', '/std/vector<mars::Option>').
+        doc('forward the original mars arguments, such as -c 1600 for setting the ode port - option consists of name, here: -c and parameter: here 1600')
 
 	property('realtime_calc', 'bool', false).
 	    doc('if true, simulation runs in real time or slower, but not faster')
@@ -98,25 +98,25 @@ task_context "Task" do
 	property('start_sim', 'bool', false).
 	    doc('starts the simulation after loading the initial scene(s)')
 
-        # Add a task context
-        # operation('addPlugin').
-        #       returns('int').
-        #       argument('taskcontext', '/
-        # method addPlugin(input: TaskContext ) return bool
-        # method removePlugin(input: TaskContext) return bool
+    # Add a task context
+    # operation('addPlugin').
+    #       returns('int').
+    #       argument('taskcontext', '/
+    # method addPlugin(input: TaskContext ) return bool
+    # method removePlugin(input: TaskContext) return bool
 
-        input_port('control_action', '/mars/Control')
+    input_port('control_action', '/mars/Control')
 
-        #This operation moves a node to a specific position, simpliar to the positions property but can be used during runtime
-        operation("move_node").
-            argument("arg","/mars/Positions")
+    #This operation moves a node to a specific position, simpliar to the positions property but can be used during runtime
+    operation("move_node").
+        argument("arg","/mars/Positions")
 
-        output_port('time', 'double')
-        output_port('simulated_time', '/base/Time')
+    output_port('time', 'double')
+    output_port('simulated_time', '/base/Time')
 
-        port_driven 'control_action'
+    port_driven 'control_action'
 
-        exception_states :PHYSICS_ERROR
+    exception_states :PHYSICS_ERROR
 end
 
 task_context "Plugin" do
@@ -126,30 +126,26 @@ task_context "Plugin" do
 end
 
 #Do not use this prugin direct use Camera or DepthCamera instead
-task_context "CameraPlugin" do
-    subclasses "Plugin"
+task_context "CameraPlugin", subclasses: "Plugin" do
     abstract
     property('name', '/std/string').
 	doc('name of the camera in the scene file')
 
 end
 
-task_context "Camera" do
-    subclasses "CameraPlugin"
+task_context "Camera", subclasses: "CameraPlugin" do
     needs_configuration
 
     output_port 'frame', ro_ptr('base::samples::frame::Frame')
 end
 
-task_context "DepthCamera" do
-    subclasses "CameraPlugin"
+task_context "DepthCamera", subclasses: "CameraPlugin" do
     needs_configuration
 
     output_port 'distance_image', ro_ptr('base::samples::DistanceImage')
 end
 
-task_context "HighResRangeFinder" do
-    subclasses "CameraPlugin"
+task_context "HighResRangeFinder", subclasses: "CameraPlugin" do
     needs_configuration
 
     property('left_limit', 'double', -Math::PI/4.0).
@@ -181,8 +177,7 @@ task_context "HighResRangeFinder" do
         doc 'Created by using the distance image of the DepthCamera'
 end
 
-task_context "Joints" do
-    subclasses "Plugin"
+task_context "Joints", subclasses: "Plugin" do
 
     property('names', 'std/vector</std/string>').
         doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
@@ -191,9 +186,9 @@ task_context "Joints" do
     property('parallel_kinematics', 'std/vector<mars/ParallelKinematic>').
         doc('maps a single joint command to two joints to control parallel kinematics simulated by two joints')
     property('scaling', 'std/vector<double>').
-	doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
+	    doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
     property('offset', 'std/vector<double>').
-	doc('Optional array of offset values that added to the scaled mars joint values. Needs to be empty or the same size as names.')
+	    doc('Optional array of offset values that added to the scaled mars joint values. Needs to be empty or the same size as names.')
     # optional configuration for the rigid_body_states
     # this module will generate on the
     property "joint_transform", "base/JointTransformVector"
@@ -201,9 +196,9 @@ task_context "Joints" do
     property("controlMode", "/mars/JointPositionAndSpeedControlMode", :IGNORE).doc('sets the how speed is interpreted in case speed and position is set :MAX_SPEED :IGNORE. unsupported: :SPEED_AT_POS')
 
     output_port( "status_samples", "base/samples/Joints" ).
-	doc "status values for the joints"
+	    doc "status values for the joints"
     input_port( "command", "base/commands/Joints" ).
-	doc "command values for the joints"
+	    doc "command values for the joints"
 
 	output_port( "current_values", "mars/JointCurrents")
 
@@ -216,21 +211,18 @@ task_context "Joints" do
 
 end
 
-task_context "ForceTorque6DOF" do
-
-	subclasses "Plugin"
+task_context "ForceTorque6DOF", subclasses: "Plugin" do
 
 	output_port("wrenches_deprecated", "std/vector< /base/samples/Wrench >")
 	output_port("wrenches", "/base/samples/Wrenches")
 
 	property('names', 'std/vector</std/string>').
         doc('Array of names of the ft sensors in the scene file.')
-        property('name_remap', 'std/vector</std/string>').
-            doc('If this array is set the sensors will be renamed for the external interface')
+    property('name_remap', 'std/vector</std/string>').
+        doc('If this array is set the sensors will be renamed for the external interface')
 end
 
-task_context "ContactForceSensor" do
-    subclasses "Plugin"
+task_context "ContactForceSensor", subclasses: "Plugin" do
 
     property('wrench_mappings', 'std::vector<mars/WrenchMapping>').
         doc('Mapping from raw sensor data to base/samples/Wrenches type')
@@ -241,17 +233,15 @@ end
 # This plugin can be used to "trigger" a simlation cycle,
 # it can be useful for operating mars with more-than-realtime
 # mode and use the task_scheduler for a fixed execution sequence
-task_context "Trigger" do
-    subclasses "Plugin"
+task_context "Trigger", subclasses: "Plugin" do
 
     property "do_step","bool",false
-    doc("This components triggeres the mars simulation cycle if the update-hook is called,
-        this is useful if an sequence between componentes is needed, like it is possible with the
-        trigger_component")
+        doc("This components triggeres the mars simulation cycle if the update-hook is called,
+            this is useful if an sequence between componentes is needed, like it is possible with the
+            trigger_component")
 end
 
-task_context "LaserRangeFinder" do
-    subclasses "Plugin"
+task_context "LaserRangeFinder", subclasses: "Plugin" do
 
     needs_configuration
 
@@ -273,13 +263,12 @@ task_context "LaserRangeFinder" do
         max_sizes('remission' => 2000, 'ranges' => 2000).
         doc "the laser scans themselves"
     property('name', '/std/string', 'laser_scanner').
-	doc('name of the sensor in the scene file')
+	    doc('name of the sensor in the scene file')
 end
 
 # Can be used to simulate laser scanners with more than one vertical scan line
 # (e.g. Velodyne).
-task_context "RotatingLaserRangeFinder" do
-    subclasses "Plugin"
+task_context "RotatingLaserRangeFinder", subclasses: "Plugin" do
 
     needs_configuration
 
@@ -296,8 +285,7 @@ task_context "RotatingLaserRangeFinder" do
         doc 'Received distances converted to a pointcloud'
 end
 
-task_context "IMU" do
-    subclasses "Plugin"
+task_context "IMU", subclasses: "Plugin" do
 
     property("provide_position", "/bool",false).
         doc("Set to true is this Sensor should output position readings")
@@ -308,21 +296,16 @@ task_context "IMU" do
     property("provide_velocity", "/bool",true).
         doc("Set to true is this Sensor should output angular/translational velocities")
 
-
-    property("imu_frame", "std/string", "imu").
-	doc "The name of the imu frame."
-    property("world_frame", "std/string", "world").
-	doc "The name of the world frame."
     property('rotate_node_relative', '/std/vector<double>' ).
-	doc('if the robot is moved my mars (yaml), rotation of the IMU may be wrong and can be set here (in degrees)')
+	    doc('if the robot is moved my mars (yaml), rotation of the IMU may be wrong and can be set here (in degrees)')
     property("position_sigma", "double", 0.0).
-	doc "Standard deviation of the position, that will be applied to the measurement."
+	    doc "Standard deviation of the position, that will be applied to the measurement."
     property("orientation_sigma", "double", 0.0).
-	doc "Standard deviation of the orientation, that will be applied to the measurement."
+	    doc "Standard deviation of the orientation, that will be applied to the measurement."
     property("velocity_sigma", "double", 0.0).
-	doc "Standard deviation of the velocity, that will be applied to the measurement."
+	    doc "Standard deviation of the velocity, that will be applied to the measurement."
     property("angular_velocity_sigma", "double", 0.0).
-	doc "Standard deviation of the angular velocity, that will be applied to the measurement."
+	    doc "Standard deviation of the angular velocity, that will be applied to the measurement."
 
     output_port('orientation_samples', '/base/samples/RigidBodyState').
         doc 'provides timestamped IMUReading samples containing the orientation estimate as reported by the IMU.'
@@ -332,19 +315,20 @@ task_context "IMU" do
     needs_configuration
 
     property('name', '/std/string', 'imu').
-	doc('name of the node in the scene file from which to get the imu data')
+	    doc('name of the node in the scene file from which to get the imu data')
 
     operation('estimate_bias').
         argument('duration', '/uint16_t').
         returns('/bool').
         doc("Normally triggers bias estimation on the xsens imu, in simulation thios does nothing")
 
+    operation('resetIMU').
+        doc("Sets origin to current pose and outputs orientation_samples relative to newly set origin")
 
 end
 
 
-task_context "EntityFakeDetection" do
-    subclasses "CameraPlugin"
+task_context "EntityFakeDetection", subclasses: "CameraPlugin" do
 
     property("frame_id", "/uint16_t", 1).
         doc("0 for coordinates in world frame. 1 for coordinates in camera frame.")
@@ -352,16 +336,27 @@ task_context "EntityFakeDetection" do
         doc("Number of vertices that have to be in the viewing frustum to be counted as seen. Center is counted as vertex.")
     property("use_camera", "/bool", false).
         doc("Whether the camera should be used.")
+    property("use_camera_coordinate_system", "/bool", false).
+        doc("Whether the rotation of the mars camera should be used. In Mars camera, x = -z, y = -x, z = y")
 
     output_port('detectionArray', '/mars/Detection3DArray').
         doc 'Puts out the entities in a ROS similar detection format.'
+
+    # # we need to transform the detection from the camera frame to the map frame:
+    # # - tell the transformer we need "a" transformation between two frames
+    # #   (the names are local and need to be configured at runtime)
+    # # - tell the transformer we are going to apply the transformation on data from the
+    # #   detectionArray port, so that it aligns the streams
+    # transformer do
+    #     transform "camera", "map"
+    #     max_latency = 0.5
+    # end
 
     needs_configuration
 
 end
 
-task_context "RobotTeleportation" do
-    subclasses "Plugin"
+task_context "RobotTeleportation", subclasses: "Plugin" do
 
     property("robot_name", "/std/string").
         doc("Name of the robot.")
@@ -388,8 +383,10 @@ task_context "RobotTeleportation" do
 
 end
 
-task_context "AstronautLocalizerTask" do
-    subclasses "Plugin"
+task_context "AstronautLocalizerTask", subclasses: "Plugin" do
+
+    # todo: make output in world coordinates (robot map) instead of mars world coordinates!
+    # todo: make it configurable
 
     property("entity_name", "/std/string", "astronaut").
         doc("Name of mars entity which represents astronaut")
@@ -398,9 +395,8 @@ task_context "AstronautLocalizerTask" do
 end
     
 
-task_context "RepositionTask" do
+task_context "RepositionTask", subclasses: "Plugin" do
   # Repositions the named entities of the given scene in the current mars scene
-    subclasses "Plugin"
 
     property("entity_names", "/std/vector<std/string>").
         doc("Name of parts to move.")
@@ -417,9 +413,8 @@ task_context "RepositionTask" do
 
 end
 
-task_context "PoseUpdateTask" do
+task_context "PoseUpdateTask", subclasses: "Plugin" do
     # Repositions the named entities of the given scene in the current mars scene
-      subclasses "Plugin"
   
       input_port('single_pose_update', '/mars/PoseUpdate')
       input_port('multi_pose_updates', '/mars/PoseUpdates')
@@ -432,8 +427,7 @@ task_context "PoseUpdateTask" do
   
   end
 
-task_context "ObjectHighlighter" do
-    subclasses "Plugin"
+task_context "ObjectHighlighter", subclasses: "Plugin" do
 
     input_port('obj_id', '/uint16_t').
         doc 'Highlights entity with given id'
@@ -443,21 +437,20 @@ task_context "ObjectHighlighter" do
 end
 
 
-task_context "Sonar" do
-    subclasses "Plugin"
+task_context "Sonar", subclasses: "Plugin" do
     needs_configuration
 
     property('node_name', 'std/string').
-	doc 'the name of the vehicle in the scene file'
+	    doc 'the name of the vehicle in the scene file'
 
     property("left_limit","double").dynamic.
-	doc 'maximum left angle'
+	    doc 'maximum left angle'
     property("right_limit","double").dynamic.
-	doc 'maximum right angle'
+	    doc 'maximum right angle'
     property("resolution","double").dynamic.
-	doc 'resolution of the sonar beam'
+	    doc 'resolution of the sonar beam'
     property("maximum_distance","double").dynamic.
-	doc 'maximum distance of the sonar beam'
+	    doc 'maximum distance of the sonar beam'
     property("ping_pong_mode","bool").dynamic.
         doc('if true ping pong mode is activated')
 
@@ -467,10 +460,9 @@ task_context "Sonar" do
 end
 
 
-task_context "Altimeter" do
-    subclasses "Plugin"
+task_context "Altimeter", subclasses: "Plugin" do
     property('node_name', 'std/string')
-	doc 'the name of the vehicle in the scene file'
+	    doc('the name of the vehicle in the scene file')
 
     needs_configuration
 
@@ -479,30 +471,29 @@ task_context "Altimeter" do
 end
 
 
-task_context "ForceTorqueApplier" do
-    subclasses "Plugin"
+task_context "ForceTorqueApplier", subclasses: "Plugin" do
     needs_configuration
 
     property('entity', 'std/string')
-	doc 'the name of the robot in the scene file'
+	    doc('the name of the robot in the scene file')
 
-		property('visualize_wrenches', 'bool', true)
-	doc 'Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators'
+    property('visualize_wrenches', 'bool', true)
+	    doc('Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators')
 
-		property('thickness', 'float', 5.0)
-	doc 'the point size of the marker'
+    property('thickness', 'float', 5.0)
+	    doc('the point size of the marker')
 
-		property('force_display_factor', 'float', 0.01)
+    property('force_display_factor', 'float', 0.01)
 
-		property('torque_display_factor', 'float', 0.01)
+    property('torque_display_factor', 'float', 0.01)
 
-		property('norm_length', 'float', 1)
+    property('norm_length', 'float', 1)
 
     input_port('wrenches', '/base/samples/Wrenches')
-	doc 'the wrenches to apply at the com at the given nodes'
+	    doc('the wrenches to apply at the com at the given nodes')
 
-		output_port('input_wrenches', '/base/samples/Wrenches')
-	doc 'copy of the input_port: the wrench to apply at the com at the given nodes'
+    output_port('input_wrenches', '/base/samples/Wrenches')
+	    doc('copy of the input_port: the wrench to apply at the com at the given nodes')
 
 	port_driven 'wrenches'
 end
@@ -510,27 +501,26 @@ end
 
 ###Here are comming AUV specific plugins for motion building
 
-task_context "ForceApplier" do
-    subclasses "Plugin"
+task_context "ForceApplier", subclasses: "Plugin" do
     needs_configuration
 
     property('node_name', 'std/string')
-	doc 'the name of the vehicle in the scene file'
+	    doc 'the name of the vehicle in the scene file'
 
     property('amount_of_actuators', 'int')
-	doc 'the amount of actuators the vehicle has'
+	    doc 'the amount of actuators the vehicle has'
 
     property('maximum_thruster_force', 'std/vector<double>')
-	doc 'The maximum thruster foce for each actuator. Is also used as a factor. The size of the vector must equal to amount_of_actuators'
+	    doc 'The maximum thruster foce for each actuator. Is also used as a factor. The size of the vector must equal to amount_of_actuators'
 
     property('thruster_position', 'std/vector</base/Vector3d>')
-	doc 'Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators'
+	    doc 'Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators'
 
     property('joint_names','std/vector</string>').
         doc 'The names of the joints, array indexes must equal to the positions'
 
     property('thruster_direction', 'std/vector</base/Vector3d>')
-	doc 'Directions of the thruster force on the vehicle. The size of the vector must equal to amount_of_actuators'
+	    doc 'Directions of the thruster force on the vehicle. The size of the vector must equal to amount_of_actuators'
 
     input_port("command", "base/commands/Joints").
         doc("actuator command as joint type").
@@ -541,10 +531,9 @@ end
 
 # This plugin models a artificial buoancy for AUVs,
 # the auv will stop to "float" at Z-Value 0 (water surface)
-task_context "AuvController" do
-    subclasses "Plugin"
+task_context "AuvController", subclasses: "Plugin" do
     property('node_name', 'std/string')
-	doc 'the name of the vehicle in the scene file'
+	    doc 'the name of the vehicle in the scene file'
 
     needs_configuration
 
@@ -560,31 +549,29 @@ task_context "AuvController" do
     property('buoyancy_force','double')
 end
 
-task_context "AuvMotion" do
+task_context "AuvMotion", subclasses: "ForceApplier" do
     doc("This task models the dynamics of underwater vehicles, according to the fossen model.
-	  A full 6d dynamic model without couple-effects is used.
-	  Thruster-dynamics are modeld by a voltage-based model.
-	  For basic functions, all properties need to be set.
-	  For more information about the model, see: Fossen, T.I.: Guidance and control of ocean vehicles")
-
-    subclasses "ForceApplier"
+        A full 6d dynamic model without couple-effects is used.
+        Thruster-dynamics are modeld by a voltage-based model.
+        For basic functions, all properties need to be set.
+        For more information about the model, see: Fossen, T.I.: Guidance and control of ocean vehicles")
 
     property("linear_damp", "/base/Vector6d").
-      doc("Linear damping coefficients, in 6 degrees of freedom")
+        doc("Linear damping coefficients, in 6 degrees of freedom")
 
     property("square_damp", "/base/Vector6d").
-      doc("Square damping coefficients, in 6 degrees of freedom")
+        doc("Square damping coefficients, in 6 degrees of freedom")
 
     property("thruster_coefficients" , "/std/vector<double>").
-      doc("The square coefficients of the thrusters, the size of the list must be the amount of actuators")
+        doc("The square coefficients of the thrusters, the size of the list must be the amount of actuators")
 
     property("voltage", "double", 0).
-      doc("Maximum volatage of the thrusters, used for pwm to force calculation")
+        doc("Maximum volatage of the thrusters, used for pwm to force calculation")
 
     property("cob", "/base/Vector3d").
-      doc("Center of Bouyancy, with respect to the origin of the vehicle")
+        doc("Center of Bouyancy, with respect to the origin of the vehicle")
 
     property("buoyancy_force", "double", 0).
-      doc("Buoyancy force applied to the vehicle")
+        doc("Buoyancy force applied to the vehicle")
 
 end

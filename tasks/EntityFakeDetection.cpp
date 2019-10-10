@@ -119,10 +119,16 @@ namespace mars {
                                      rotation,
                                      detectionArray->detections[i].bbox.size);
         if (frame_id==FrameId::CAMERA) {
+          //todo: this should be done in the rock camera frame, not the camera coordinates of the mars camera sensor!
           cameraStruct cs;
           camera->getCameraInfo(&cs);
-          center = -(cs.rot.inverse() * cs.pos) + cs.rot.inverse() * center;
-          rotation = cs.rot.inverse() * rotation;
+
+          center = center-cs.pos;
+          if (_use_camera_coordinate_system.get()) {
+            // if camera coordinate system should be used, we need to transform center and rotation by inverse of camera rotation
+            center = cs.rot.inverse() * center; //-(cs.rot.inverse() * cs.pos) + cs.rot.inverse() * center;
+            rotation = cs.rot.inverse() * rotation;
+          }
         }
         detectionArray->detections[i].bbox.center.position = center;
         detectionArray->detections[i].bbox.center.orientation = rotation;
