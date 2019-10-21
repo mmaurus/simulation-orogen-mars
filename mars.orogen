@@ -286,7 +286,10 @@ task_context "RotatingLaserRangeFinder", subclasses: "Plugin" do
 end
 
 task_context "IMU", subclasses: "Plugin" do
-
+    property("imu_frame", "std/string", "imu").
+        doc("The name of the imu frame.")
+    property("world_frame", "std/string", "world").
+        doc("The name of the world frame.")
     property("provide_position", "/bool",false).
         doc("Set to true is this Sensor should output position readings")
 
