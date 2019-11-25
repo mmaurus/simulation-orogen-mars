@@ -40,24 +40,49 @@ void AstronautLocalizerTask::updateHook()
 {
     AstronautLocalizerTaskBase::updateHook();
 
-    sim::SimEntity* ent = control->entities->getEntity(_entity_name.get(), false);
-    if (ent == nullptr)
-        ent = control->entities->getRootOfAssembly(_entity_name.get());
-    if (ent != nullptr) {
-        configmaps::ConfigMap cfg = ent->getConfig();
-        base::samples::RigidBodyState p;
-        p.position[0] = cfg["position"][0];
-        p.position[1] = cfg["position"][1];
-        p.position[2] = cfg["position"][2];
+    sim::SimEntity* astronaut = control->entities->getEntity(_astronaut_name.get(), false);
+    if (astronaut == nullptr)
+        astronaut = control->entities->getRootOfAssembly(_astronaut_name.get());
+    if (astronaut != nullptr) {
+        configmaps::ConfigMap cfg = astronaut->getConfig();
+        base::samples::RigidBodyState astro;
+        astro.position[0] = cfg["position"][0];
+        astro.position[1] = cfg["position"][1];
+        astro.position[2] = cfg["position"][2];
+        astro.orientation = Eigen::Quaterniond(cfg["rotation"][0], cfg["rotation"][1], cfg["rotation"][2], cfg["rotation"][3]);
 
-        p.orientation = Eigen::Quaterniond(cfg["rotation"][0], cfg["rotation"][1], cfg["rotation"][2], cfg["rotation"][3]);
+        astro.sourceFrame = "astronaut_feet";
+        astro.targetFrame = "world";
 
-        p.sourceFrame = "astronaut_feet";
-        p.targetFrame = "world";
+        if (_coordinate_frame_id.get() == 1) {
+            sim::SimEntity* robot = control->entities->getEntity(_robot_name.get(), false);
+            if (robot == nullptr)
+                robot = control->entities->getRootOfAssembly(_robot_name.get());
+            if (robot != nullptr) {
+                configmaps::ConfigMap cfg = robot->getConfig();
+                base::samples::RigidBodyState rob;
+                rob.position[0] = cfg["position"][0];
+                rob.position[1] = cfg["position"][1];
+                rob.position[2] = cfg["position"][2];
+                rob.orientation = Eigen::Quaterniond(cfg["rotation"][0], cfg["rotation"][1], cfg["rotation"][2], cfg["rotation"][3]);
 
-        _astronaut_pose.write(p);
+                //base::Quaterniond 
+                std::cout << "rob position = " << rob.position << std::endl;
+                std::cout << "astronaut position = " << astro.position << std::endl;
+
+                //astro.orientation = rob.orientation.conjugate() * astro.orientation;
+                astro.position = astro.position - rob.position;
+
+                astro.targetFrame = "map";
+
+            } else {
+                LOG_ERROR("Neither entity nor assembly with name '%s' found!", _robot_name.get().c_str());
+            }
+        }
+
+        _astronaut_pose.write(astro);
     } else {
-        LOG_ERROR("Neither entity nor assembly with name '%s' found!", _entity_name.get().c_str());
+        LOG_ERROR("Neither entity nor assembly with name '%s' found!", _astronaut_name.get().c_str());
     }
 }
 void AstronautLocalizerTask::errorHook()

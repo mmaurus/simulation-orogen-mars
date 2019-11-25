@@ -94,7 +94,7 @@ namespace mars {
         }
       } else {
         visible_entities = *(control->entities->subscribeToEntityCreation(nullptr));
-        frame_id = FrameId::GLOBAL;
+        //frame_id = FrameId::GLOBAL;
         minVisibleVertices = 0;
       }
 
@@ -123,8 +123,10 @@ namespace mars {
           cameraStruct cs;
           camera->getCameraInfo(&cs);
 
-          center = center-cs.pos;
+          //todo: this is not correct. Test it or delete
+          center = center-cs.pos;          
           if (_use_camera_coordinate_system.get()) {
+            //this works
             // if camera coordinate system should be used, we need to transform center and rotation by inverse of camera rotation
             center = cs.rot.inverse() * center; //-(cs.rot.inverse() * cs.pos) + cs.rot.inverse() * center;
             rotation = cs.rot.inverse() * rotation;

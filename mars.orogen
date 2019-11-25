@@ -335,7 +335,7 @@ task_context "EntityFakeDetection", subclasses: "CameraPlugin" do
         doc("Number of vertices that have to be in the viewing frustum to be counted as seen. Center is counted as vertex.")
     property("use_camera", "/bool", false).
         doc("Whether the camera should be used.")
-    property("use_camera_coordinate_system", "/bool", false).
+    property("use_camera_coordinate_system", "/bool", true).
         doc("Whether the rotation of the mars camera should be used. In Mars camera, x = -z, y = -x, z = y")
 
     output_port('detectionArray', '/mars/Detection3DArray').
@@ -387,8 +387,12 @@ task_context "AstronautLocalizerTask", subclasses: "Plugin" do
     # todo: make output in world coordinates (robot map) instead of mars world coordinates!
     # todo: make it configurable
 
-    property("entity_name", "/std/string", "astronaut").
+    property("coordinate_frame_id", "/uint16_t", 1).
+        doc("0 for coordinates in mars frame. 1 for coordinates in world/robot map frame.")
+    property("astronaut_name", "/std/string", "astronaut").
         doc("Name of mars entity which represents astronaut")
+    property("robot_name", "/std/string", "robot").
+        doc("Name of mars entity which represents rh5")
 
     output_port("astronaut_pose", "/base/samples/RigidBodyState")
 end
