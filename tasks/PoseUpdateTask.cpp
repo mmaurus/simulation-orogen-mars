@@ -33,8 +33,9 @@ namespace mars {
   }
 
   void PoseUpdateTask::applyPose(std::string entityname, base::Pose pose) {
-    sim::SimEntity* ent = control->entities->getEntity(entityname);
-
+    sim::SimEntity* ent = control->entities->getEntity(entityname, false);
+    if (ent == nullptr)
+        ent = control->entities->getRootOfAssembly(entityname);
     if (ent == nullptr) {
       std::cerr << "mars::PoseUpdateTask | given entity name \"" << entityname << "\" could not be found in entity manager." << std::endl;
       return;
