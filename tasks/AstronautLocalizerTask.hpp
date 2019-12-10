@@ -25,7 +25,7 @@ namespace mars{
     {
 	friend class AstronautLocalizerTaskBase;
     protected:
-
+        unsigned int astronaut_id;
 
 
     public:

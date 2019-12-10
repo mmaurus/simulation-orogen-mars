@@ -33,27 +33,41 @@ namespace mars {
   }
 
   void PoseUpdateTask::applyPose(std::string entityname, base::Pose pose) {
-    sim::SimEntity* ent = control->entities->getEntity(entityname, false);
-    if (ent == nullptr)
-        ent = control->entities->getRootOfAssembly(entityname);
-    if (ent == nullptr) {
-      std::cerr << "mars::PoseUpdateTask | given entity name \"" << entityname << "\" could not be found in entity manager." << std::endl;
-      return;
+
+    unsigned int id = control->nodes->getID(entityname);
+    if (id == 0) {
+        LOG_ERROR("Neither entity nor assembly with name '%s' found!", entityname.c_str());
+        return;
     }
+
+    mars::interfaces::NodeData robotnodedata = control->nodes->getFullNode(id);
     
-    configmaps::ConfigMap cfg = ent->getConfig();
-    cfg["position"][0] = pose.position[0];
-    cfg["position"][1] = pose.position[1];
-    cfg["position"][2] = pose.position[2];
+    robotnodedata.pos = pose.position;
+    robotnodedata.rot = pose.orientation;
 
-    cfg["rotation"][0] = pose.orientation.w();
-    cfg["rotation"][1] = pose.orientation.x();
-    cfg["rotation"][2] = pose.orientation.y();
-    cfg["rotation"][3] = pose.orientation.z();
+    control->nodes->editNode(&robotnodedata, mars::interfaces::EDIT_NODE_POS | mars::interfaces::EDIT_NODE_ROT);
 
-    control->sim->physicsThreadLock();
-    ent->setInitialPose(true, &cfg);
-    control->sim->physicsThreadUnlock();
+    // sim::SimEntity* ent = control->entities->getEntity(entityname, false);
+    // if (ent == nullptr)
+    //     ent = control->entities->getRootOfAssembly(entityname);
+    // if (ent == nullptr) {
+    //   std::cerr << "mars::PoseUpdateTask | given entity name \"" << entityname << "\" could not be found in entity manager." << std::endl;
+    //   return;
+    // }
+    
+    // configmaps::ConfigMap cfg = ent->getConfig();
+    // cfg["position"][0] = pose.position[0];
+    // cfg["position"][1] = pose.position[1];
+    // cfg["position"][2] = pose.position[2];
+
+    // cfg["rotation"][0] = pose.orientation.w();
+    // cfg["rotation"][1] = pose.orientation.x();
+    // cfg["rotation"][2] = pose.orientation.y();
+    // cfg["rotation"][3] = pose.orientation.z();
+
+    // control->sim->physicsThreadLock();
+    // ent->setInitialPose(true, &cfg);
+    // control->sim->physicsThreadUnlock();
   }
 
 // void PoseUpdateTask::applyRelativePose(std::string entityname, base::Pose pose) {
