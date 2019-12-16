@@ -1,13 +1,15 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef MARS_AstronautLocalizerTASK_TASK_HPP
-#define MARS_AstronautLocalizerTASK_TASK_HPP
+#ifndef MARS_ENTITYPOSEPUBLISHERTASK_TASK_HPP
+#define MARS_ENTITYPOSEPUBLISHERTASK_TASK_HPP
 
-#include "mars/AstronautLocalizerTaskBase.hpp"
+#include "mars/EntityPosePublisherTaskBase.hpp"
+#include <base/samples/RigidBodyState.hpp>
+#include <base-logging/Logging.hpp>
 
 namespace mars{
 
-    /*! \class AstronautLocalizerTask
+    /*! \class EntityPosePublisherTask
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
@@ -16,28 +18,28 @@ namespace mars{
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','mars::AstronautLocalizerTask')
+         task('custom_task_name','mars::EntityPosePublisherTask')
      end
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
-    class AstronautLocalizerTask : public AstronautLocalizerTaskBase
+    class EntityPosePublisherTask : public EntityPosePublisherTaskBase
     {
-	friend class AstronautLocalizerTaskBase;
+	friend class EntityPosePublisherTaskBase;
     protected:
-        unsigned int astronaut_id;
-
+        std::vector<std::string> entity_names;
+        std::vector<RTT::OutputPort<base::samples::RigidBodyState>*> out_ports_;
 
     public:
-        /** TaskContext constructor for AstronautLocalizerTask
+        /** TaskContext constructor for EntityPosePublisherTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        AstronautLocalizerTask(std::string const& name = "mars::AstronautLocalizerTask");
+        EntityPosePublisherTask(std::string const& name = "mars::EntityPosePublisherTask");
 
-        /** Default deconstructor of AstronautLocalizerTask
+        /** Default deconstructor of EntityPosePublisherTask
          */
-	    ~AstronautLocalizerTask();
+        ~EntityPosePublisherTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

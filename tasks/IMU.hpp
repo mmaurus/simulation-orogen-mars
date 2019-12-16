@@ -31,18 +31,18 @@ namespace mars {
 
     protected:
 
-    /* Normally triggers bias estimation on the xsens imu, in simulation thios does nothing
-     */
-    virtual bool estimate_bias(boost::uint16_t duration){};
+        /* Normally triggers bias estimation on the xsens imu, in simulation thios does nothing
+        */
+        virtual bool estimate_bias(boost::uint16_t duration){};
 
         long node_id;
         base::samples::RigidBodyState rbs;
         base::samples::IMUSensors imusens;
-	boost::mt19937 rnd_generator;
-	boost::normal_distribution<double> translation_noise;
-	boost::normal_distribution<double> rotation_noise;
-	boost::normal_distribution<double> velocity_noise;
-	boost::normal_distribution<double> angular_velocity_noise;
+        boost::mt19937 rnd_generator;
+        boost::normal_distribution<double> translation_noise;
+        boost::normal_distribution<double> rotation_noise;
+        boost::normal_distribution<double> velocity_noise;
+        boost::normal_distribution<double> angular_velocity_noise;
         void update( double time );
 
 
@@ -62,7 +62,7 @@ namespace mars {
 
         /** Default deconstructor of IMU
          */
-	~IMU();
+	    ~IMU();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

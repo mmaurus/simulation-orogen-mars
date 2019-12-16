@@ -382,19 +382,18 @@ task_context "RobotTeleportation", subclasses: "Plugin" do
 
 end
 
-task_context "AstronautLocalizerTask", subclasses: "Plugin" do
+task_context "EntityPosePublisherTask", subclasses: "Plugin" do
 
-    # todo: make output in world coordinates (robot map) instead of mars world coordinates!
-    # todo: make it configurable
+    property("entity_names", "/std/vector<std/string>").
+        doc("vector of entity names whose pose should be published")
 
-    property("coordinate_frame_id", "/uint16_t", 1).
-        doc("0 for coordinates in mars frame. 1 for coordinates in world/robot map frame.")
-    property("astronaut_name", "/std/string", "astronaut").
-        doc("Name of mars entity which represents astronaut")
-    property("robot_name", "/std/string", "robot").
-        doc("Name of mars entity which represents rh5")
+    property("world_frame", "/std/string", "world").
+        doc("Name of global world frame")
 
-    output_port("astronaut_pose", "/base/samples/RigidBodyState")
+    dynamic_output_port(/\w/, "/base/samples/RigidBodyState")
+    periodic
+
+    needs_configuration
 end
     
 
