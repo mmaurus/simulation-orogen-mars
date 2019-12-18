@@ -391,7 +391,7 @@ task_context "EntityPosePublisherTask", subclasses: "Plugin" do
         doc("Name of global world frame")
 
     dynamic_output_port(/\w/, "/base/samples/RigidBodyState")
-    periodic
+    periodic 1.0
 
     needs_configuration
 end
