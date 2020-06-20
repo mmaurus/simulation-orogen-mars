@@ -72,7 +72,7 @@ namespace mars {
 
     //get all entities
     visible_entities = *(control->entities->subscribeToEntityCreation(nullptr));
-    detectionArray = new Detection3DArray(visible_entities.size());
+    detectionArray = new object_detection_control::Detection3DArray(visible_entities.size());
 
     LOG_DEBUG_S << "EntityFakeDetection"<< "Task started!";
 
@@ -90,7 +90,7 @@ namespace mars {
         camera->getEntitiesInView(visible_entities, minVisibleVertices);
         if (visible_entities.size()!=detectionArray->detections.size()) {
           delete detectionArray;
-          detectionArray = new Detection3DArray(visible_entities.size());
+          detectionArray = new object_detection_control::Detection3DArray(visible_entities.size());
         }
       } else {
         visible_entities = *(control->entities->subscribeToEntityCreation(nullptr));

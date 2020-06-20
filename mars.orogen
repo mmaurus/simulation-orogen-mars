@@ -10,10 +10,10 @@ using_library "configmaps", :typekit => false
 import_types_from "tasks/MarsControl.hpp"
 import_types_from "jointTypes.hpp"
 import_types_from "poseType.hpp"
-import_types_from "objectDetectionTypes.hpp"
 import_types_from "wrenchTypes.hpp"
 import_types_from "poseUpdateType.hpp"
 import_types_from "base"
+import_types_from "object_detection_control"
 
 
 #Disable default deployments, most of the time stand_alone deployments are useless
@@ -338,7 +338,7 @@ task_context "EntityFakeDetection", subclasses: "CameraPlugin" do
     property("use_camera_coordinate_system", "/bool", true).
         doc("Whether the rotation of the mars camera should be used. In Mars camera, x = -z, y = -x, z = y")
 
-    output_port('detectionArray', '/mars/Detection3DArray').
+    output_port('detectionArray', '/object_detection_control/Detection3DArray').
         doc 'Puts out the entities in a ROS similar detection format.'
 
     # # we need to transform the detection from the camera frame to the map frame:
