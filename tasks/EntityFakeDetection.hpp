@@ -44,6 +44,7 @@ namespace mars {
       FrameId frame_id;
       unsigned int minVisibleVertices;
       bool camera_available, use_camera;
+      std::string camera_link_name;
 
     public:
       virtual void init();
