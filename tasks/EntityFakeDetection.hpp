@@ -7,7 +7,7 @@
 #include <mars/sim/SimEntity.h>
 #include <base/Pose.hpp>
 #include <base/Time.hpp>
-#include "objectDetectionTypes.hpp"
+#include <object_detection_control/objectDetectionTypes.hpp>
 
 
 namespace mars {
@@ -40,10 +40,11 @@ namespace mars {
 
       std::map<unsigned long, sim::SimEntity*> visible_entities;
       unsigned long seq = 0;
-      Detection3DArray* detectionArray;
+      object_detection_control::Detection3DArray* detectionArray;
       FrameId frame_id;
       unsigned int minVisibleVertices;
       bool camera_available, use_camera;
+      std::string camera_link_name;
 
     public:
       virtual void init();

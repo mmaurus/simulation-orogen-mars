@@ -50,9 +50,13 @@ namespace mars {
     minVisibleVertices = _minVisibleVertices.get();
     use_camera = (bool) _use_camera.get();
 
-    if (use_camera == false) {
+    camera_link_name = _camera_link.get();
+
+    if (use_camera == false || camera_link_name.empty() ) {
       frame_id = FrameId::GLOBAL;
     }
+
+
 
     LOG_DEBUG_S << "EntityFakeDetection"<< "Task configured! " << (use_camera ? "(Using Camera)":"(Not Using Camera)");
 
@@ -72,7 +76,7 @@ namespace mars {
 
     //get all entities
     visible_entities = *(control->entities->subscribeToEntityCreation(nullptr));
-    detectionArray = new Detection3DArray(visible_entities.size());
+    detectionArray = new object_detection_control::Detection3DArray(visible_entities.size());
 
     LOG_DEBUG_S << "EntityFakeDetection"<< "Task started!";
 
@@ -90,7 +94,7 @@ namespace mars {
         camera->getEntitiesInView(visible_entities, minVisibleVertices);
         if (visible_entities.size()!=detectionArray->detections.size()) {
           delete detectionArray;
-          detectionArray = new Detection3DArray(visible_entities.size());
+          detectionArray = new object_detection_control::Detection3DArray(visible_entities.size());
         }
       } else {
         visible_entities = *(control->entities->subscribeToEntityCreation(nullptr));
@@ -118,8 +122,47 @@ namespace mars {
         iter->second->getBoundingBox(center,
                                      rotation,
                                      detectionArray->detections[i].bbox.size);
-        if (frame_id==FrameId::CAMERA) {
-          //todo: this should be done in the rock camera frame, not the camera coordinates of the mars camera sensor!
+
+        // pose of the object relative to the camera
+        // otherwise the object pose is relative to the world
+        if (frame_id == FrameId::CAMERA) {
+
+          // since the name is unique, it should be only one camera node
+          int idx = 0;
+          std::vector<interfaces::NodeId>  camera_nodes = control->nodes->getNodeIDs(camera_link_name);
+          
+          if (camera_nodes.size() == 0) {
+            LOG_ERROR_S << "No camera node with the name " << camera_link_name << " was found.";
+            return;
+          }
+          if (camera_nodes.size() > 1) {
+            LOG_ERROR_S << "There are several nodes with the name " << camera_link_name << ".";
+            return;
+          }
+
+          NodeId camera_id = camera_nodes.at(idx);
+          utils::Vector camera_pos = control->nodes->getPosition(camera_id);
+          utils::Quaternion camera_orient = control->nodes->getRotation(camera_id);
+
+          // camera pose in world cs
+          Eigen::Affine3d camera_tf;
+          camera_tf.setIdentity();
+          camera_tf.rotate(camera_orient);
+          camera_tf.translation() = camera_pos;
+
+          // object pose in world cs
+          Eigen::Affine3d node_tf;
+          node_tf.setIdentity();
+          node_tf.rotate(rotation);
+          node_tf.translation() = center;          
+
+          // convert position of object from world cs into camera cs
+          Eigen::Affine3d node_in_camera_cs = camera_tf.inverse() * node_tf;
+
+          center = node_in_camera_cs.translation();
+          rotation = base::Quaterniond(node_in_camera_cs.rotation());
+
+          /*//todo: this should be done in the rock camera frame, not the camera coordinates of the mars camera sensor!
           cameraStruct cs;
           camera->getCameraInfo(&cs);
 
@@ -130,8 +173,9 @@ namespace mars {
             // if camera coordinate system should be used, we need to transform center and rotation by inverse of camera rotation
             center = cs.rot.inverse() * center; //-(cs.rot.inverse() * cs.pos) + cs.rot.inverse() * center;
             rotation = cs.rot.inverse() * rotation;
-          }
+          }*/
         }
+
         detectionArray->detections[i].bbox.center.position = center;
         detectionArray->detections[i].bbox.center.orientation = rotation;
         //ObjectHypothesisWithPose
