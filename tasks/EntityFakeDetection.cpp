@@ -55,8 +55,7 @@ namespace mars {
     if (use_camera == false || camera_link_name.empty() ) {
       frame_id = FrameId::GLOBAL;
     }
-
-
+    type_prefix = _type_prefix.get();
 
     LOG_DEBUG_S << "EntityFakeDetection"<< "Task configured! " << (use_camera ? "(Using Camera)":"(Not Using Camera)");
 
@@ -176,19 +175,48 @@ namespace mars {
           }*/
         }
 
+        float pos_noise = _pos_noise.get();
+        if (pos_noise > 0.0) {
+          LOG_DEBUG_S << "pos = " << center.transpose() << std::endl;
+          float noise_x = pos_noise * (2.0 * float(std::rand()) / float(RAND_MAX) - 1);
+          float noise_y = pos_noise * (2.0 * float(std::rand()) / float(RAND_MAX) - 1);
+          float noise_z = pos_noise * (2.0 * float(std::rand()) / float(RAND_MAX) - 1);
+          center = utils::Vector(center.x() + noise_x, center.y() + noise_y, center.z() + noise_z);
+          LOG_DEBUG_S << "pos with noise = " << center.transpose() << std::endl;
+        }
+        float rot_deg_noise = _rot_deg_noise.get();
+        if (rot_deg_noise > 0.0) {
+          // add noise to quaternion 
+          Eigen::Vector3d random_axis = Eigen::Vector3d::Random();
+          random_axis.normalize();
+          float random_angle = rot_deg_noise * (2.0 * float(std::rand()) / float(RAND_MAX) - 1.0) * M_PI/180.0;
+          Eigen::Quaterniond noise_q(Eigen::AngleAxisd(random_angle, random_axis));
+          LOG_DEBUG_S << "rotation = " << rotation.coeffs().transpose() << std::endl;
+          rotation = rotation * noise_q;
+          LOG_DEBUG_S << "rotation with noise = " << rotation.coeffs().transpose() << std::endl;
+        }
+
         detectionArray->detections[i].bbox.center.position = center;
         detectionArray->detections[i].bbox.center.orientation = rotation;
         //ObjectHypothesisWithPose
         detectionArray->detections[i].results[0].id = iter->first;
-        detectionArray->detections[i].results[0].type = iter->second->getName();
+        detectionArray->detections[i].results[0].type = type_prefix + iter->second->getName();
         detectionArray->detections[i].results[0].pose.pose.position = center;
         detectionArray->detections[i].results[0].pose.pose.orientation = rotation;
         //PointCloud
         detectionArray->detections[i].source_cloud.header.stamp = base::Time::fromMilliseconds(control->sim->getTime());
         detectionArray->detections[i].source_cloud.header.seq = seq++;
         detectionArray->detections[i].source_cloud.header.frame_id = (int) frame_id;
-        //TODO detectionArray->detections[i].source_cloud.width = control->nodes->getFullNode(rootId).mesh.vertexcount;
-        //detectionArray->detections[i].source_cloud.points = control->nodes->getFullNode(rootId).mesh.vertices;// REVIEW+
+        //TODO: looks like mars does not have pointclouds stored by default.
+        // how would you get those?
+        long unsigned int rootId = iter->second->getRootestId();
+        const snmesh& mesh = control->nodes->getFullNode(rootId).mesh;
+        detectionArray->detections[i].source_cloud.width = mesh.vertexcount;
+        const mydVector3* vertices = mesh.vertices;
+        for (unsigned int v=0; v<mesh.vertexcount; ++v) {
+          base::Vector3d p(vertices[v][0], vertices[v][1], vertices[v][2]);
+          detectionArray->detections[i].source_cloud.points.push_back(p);
+        }
         i++;
       }
 
