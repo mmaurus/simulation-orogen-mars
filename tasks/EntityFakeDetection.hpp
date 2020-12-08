@@ -46,8 +46,10 @@ namespace mars {
       bool camera_available, use_camera;
       std::string camera_link_name;
       std::string type_prefix;
+      std::string object_class_to_detect;
 
     public:
+
       virtual void init();
       virtual void update(double delta_t);
       /** TaskContext constructor for EntityFakeDetection

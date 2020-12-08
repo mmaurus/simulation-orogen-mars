@@ -345,6 +345,10 @@ task_context "EntityFakeDetection", subclasses: "CameraPlugin" do
         doc("If 0, no noise is used. Else add noise to object orientation. Should be positive. +- degrees!")
     property("type_prefix", "/std/string", "").
         doc("add prefix to object type")
+    #property("object_class_to_detect", "/std/string", "").
+    #    doc("if set, only objects of given type are written to detectionArray")
+
+    input_port("object_class_to_detect", "/std/string")
 
     output_port('detectionArray', "/object_detection_control/Detection3DArray").
         doc 'Puts out the entities in a ROS similar detection format.'
