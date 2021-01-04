@@ -111,17 +111,16 @@ namespace mars
         utils::Vector center;
         utils::Quaternion rotation;
         std::string needed_type = object_class_to_detect;
-        std::cout << "needed_type = " << needed_type << std::endl;
-        std::cout << "EntityFakeDetection: got " << visible_entities.size() << std::endl;
-        std::cout << "detectionArray.detections.size() = " << detectionArray.detections.size() << std::endl;
+        LOG_DEBUG_S << "needed_type = " << needed_type << std::endl;
+        LOG_DEBUG_S << "detectionArray.detections.size() = " << detectionArray.detections.size() << std::endl;
         for (std::map<unsigned long, sim::SimEntity *>::iterator iter = visible_entities.begin(); iter != visible_entities.end(); ++iter) {
             LOG_DEBUG_S << "detecting";
             
             sim::SimEntity* entity = iter->second;
 
-            std::cout << "type = " << entity->getName() << std::endl;
+            LOG_DEBUG_S << "type = " << entity->getName() << std::endl;
             if (!needed_type.empty() && entity->getName() != needed_type) {
-                std::cout << "continue..." << std::endl;
+                LOG_DEBUG_S << "continue..." << std::endl;
                 continue;
             }
 
@@ -172,18 +171,15 @@ namespace mars
                 center = node_in_camera_cs.translation();
                 rotation = base::Quaterniond(node_in_camera_cs.rotation());
 
-                /*//todo: this should be done in the rock camera frame, not the camera coordinates of the mars camera sensor!
-                cameraStruct cs;
-                camera->getCameraInfo(&cs);
-
-                //todo: this is not correct. Test it or delete
-                center = center-cs.pos;          
-                if (_use_camera_coordinate_system.get()) {
-                    //this works
-                    // if camera coordinate system should be used, we need to transform center and rotation by inverse of camera rotation
-                    center = cs.rot.inverse() * center; //-(cs.rot.inverse() * cs.pos) + cs.rot.inverse() * center;
-                    rotation = cs.rot.inverse() * rotation;
-                }*/
+                if(_use_camera_intern.get()) {
+                    Eigen::Matrix3d T;
+                    T << 0, -1, 0, 0, 0, -1, 1, 0, 0;
+                    LOG_DEBUG_S << "T = " << T << std::endl;
+                    Eigen::Quaterniond q(T);
+                    center = q * center;
+                    rotation = q * rotation;
+                    LOG_DEBUG_S << "new center = " << center.transpose() << std::endl;
+                }
             }
 
             float pos_noise = _pos_noise.get();
@@ -237,7 +233,7 @@ namespace mars
         //write to rock outputs
         if (detectionArray.detections.size() > 0) {
             _detectionArray.write(detectionArray);
-            std::cout << "EntityFakeDetection: write " << detectionArray.detections.size() << std::endl;
+            LOG_DEBUG_S << "EntityFakeDetection: write " << detectionArray.detections.size() << "objects" << std::endl;
         }
     }
     // void EntityFakeDetection::errorHook()

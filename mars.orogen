@@ -337,8 +337,8 @@ task_context "EntityFakeDetection", subclasses: "CameraPlugin" do
         doc("Number of vertices that have to be in the viewing frustum to be counted as seen. Center is counted as vertex.")
     property("use_camera", "/bool", false).
         doc("Whether the camera should be used.")
-    property("use_camera_coordinate_system", "/bool", true).
-        doc("Whether the rotation of the mars camera should be used. In Mars camera, x = -z, y = -x, z = y")
+    property("use_camera_intern", "/bool", true).
+        doc("If true, transform coordinates so that z is forward, x is right and y is down. In Mars camera CS is like this: x = forward, y = left, z = up")
     property("pos_noise", "/float", 0.0).
         doc("If 0, no noise is used. Else add noise to object position. Should be positive! +- cm")
     property("rot_deg_noise", "/float", 0.0).
