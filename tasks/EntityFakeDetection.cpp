@@ -47,12 +47,13 @@ namespace mars
             return false;
 
         frame_id = FrameId(_frame_id.get());
+
         minVisibleVertices = _minVisibleVertices.get();
         use_camera = (bool)_use_camera.get();
 
         camera_link_name = _camera_link.get();
 
-        if (use_camera == false || camera_link_name.empty()) {
+        if (camera_link_name.empty()) {
             frame_id = FrameId::GLOBAL;
         }
         type_prefix = _type_prefix.get();
@@ -113,6 +114,7 @@ namespace mars
         std::string needed_type = object_class_to_detect;
         LOG_DEBUG_S << "needed_type = " << needed_type << std::endl;
         LOG_DEBUG_S << "detectionArray.detections.size() = " << detectionArray.detections.size() << std::endl;
+
         for (std::map<unsigned long, sim::SimEntity *>::iterator iter = visible_entities.begin(); iter != visible_entities.end(); ++iter) {
             LOG_DEBUG_S << "detecting";
             
@@ -135,7 +137,6 @@ namespace mars
             // pose of the object relative to the camera
             // otherwise the object pose is relative to the world
             if (frame_id == FrameId::CAMERA) {
-
                 // since the name is unique, it should be only one camera node
                 int idx = 0;
                 std::vector<interfaces::NodeId> camera_nodes = control->nodes->getNodeIDs(camera_link_name);
